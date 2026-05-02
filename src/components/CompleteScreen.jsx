@@ -1,8 +1,9 @@
-import { STORY, COGNITIVE_PROCESSES } from "../data/gameData";
+import { STORY, COGNITIVE_PROCESSES, LEVELS } from "../data/gameData";
 
-export default function CompleteScreen({ collectedShards, collectedRewards, totalTime, hintsUsed, levelTimes }) {
+export default function CompleteScreen({ playerName, collectedShards, collectedRewards, totalTime, hintsUsed, levelTimes, levelAttempts }) {
   const minutes = Math.floor(totalTime / 60);
   const seconds = totalTime % 60;
+  const rating = hintsUsed === 0 ? 'PURE' : hintsUsed < 3 ? 'SHARP' : 'AIDED';
 
   return (
     <div className="complete-screen">
@@ -18,6 +19,13 @@ export default function CompleteScreen({ collectedShards, collectedRewards, tota
 
       <div className="complete-content">
         <div className="complete-icon">◈</div>
+
+        <div className="complete-player-greeting">
+          <span className="greeting-label">OPERATOR</span>
+          <span className="greeting-name">{playerName}</span>
+          <span className="greeting-tag">— RECONSTRUCTION COMPLETE</span>
+        </div>
+
         <h1 className="complete-title">MEMORY FULLY RECONSTRUCTED</h1>
 
         <div className="revelation-box">
@@ -39,10 +47,30 @@ export default function CompleteScreen({ collectedShards, collectedRewards, tota
             <div className="stat-label">Hints Used</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value">{hintsUsed === 0 ? 'PURE' : hintsUsed < 3 ? 'SHARP' : 'AIDED'}</div>
+            <div className={`stat-value rating-${rating.toLowerCase()}`}>{rating}</div>
             <div className="stat-label">Cognition Rating</div>
           </div>
         </div>
+
+        {/* Per-level breakdown */}
+        {levelTimes.length > 0 && (
+          <div className="level-breakdown">
+            <div className="breakdown-title">PER-VAULT PERFORMANCE:</div>
+            <div className="breakdown-table">
+              <div className="bt-header">
+                <span>Vault</span><span>Puzzle Type</span><span>Time</span><span>Attempts</span>
+              </div>
+              {LEVELS.map((l, i) => (
+                <div key={i} className="bt-row">
+                  <span className="bt-vault">{String(i + 1).padStart(2, '0')} {l.title}</span>
+                  <span className="bt-type">{l.puzzle.type}</span>
+                  <span className="bt-time">{levelTimes[i] != null ? `${levelTimes[i]}s` : '—'}</span>
+                  <span className="bt-attempts">{levelAttempts[i] != null ? `×${levelAttempts[i]}` : '—'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="cognitive-breakdown">
           <div className="breakdown-title">COGNITIVE PROCESSES ENGAGED:</div>
@@ -59,19 +87,9 @@ export default function CompleteScreen({ collectedShards, collectedRewards, tota
           </div>
         </div>
 
-        <div className="shards-collection">
-          <div className="shards-title">RECOVERED MEMORY SHARDS:</div>
-          {collectedShards.map((shard, i) => (
-            <div key={i} className="final-shard">
-              <span className="shard-num">{i + 1}</span>
-              <span>{shard}</span>
-            </div>
-          ))}
-        </div>
-
         <div className="project-note">
           <div className="project-label">◈ ECHO MIND — Cognitive Psychology Final Project</div>
-          <div className="project-sub">Demonstrating: Problem Solving, Logical Reasoning, Pattern Recognition, Decision Making</div>
+          <div className="project-sub">Demonstrating: Problem Solving · Logical Reasoning · Pattern Recognition · Decision Making</div>
         </div>
 
         <button className="btn-primary" onClick={() => window.location.reload()}>
